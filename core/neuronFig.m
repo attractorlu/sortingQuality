@@ -51,6 +51,8 @@ for i=1:nWFsToLoad
      theseWF(i,:,:) = tempWF(params.chanMap+1,:);
 end
 
+theseWF = theseWF - repmat(mean(theseWF,3), [1 1 nWFsamps] );
+
 for i = 1:params.nWFsToPlot %
      tempWF = mmf.Data.x(1:nChInFile,extractBckg(i)+wfWin(1):extractBckg(i)+wfWin(end));
      bckgWF(i,:,:) = tempWF(params.chanMap+1,:);
@@ -60,6 +62,7 @@ end
 % medWF = squeeze(median(double(theseWF),1))';
 % medWFuV = medWF.*params.gain;
 medWFuV = stats.medWF;
+medWFuV = medWFuV - repmat(mean(medWFuV), [nWFsamps 1]);
 
 %%
 
@@ -152,7 +155,7 @@ otherColor = [0.4660    0.6740    0.1880];
 
 %% plot of location on probe
 subplot(4,5,[1 6 11 16])
-plotAsProbe(-chanAmps, xc, yc, colormap(gray), 16, 40)
+plotAsProbe(chanAmps, xc, yc)
 hold on;
 minx = min(xc)-8; maxx = max(xc)+8; miny = min(yc)-20; maxy = max(yc)+20;
 plot([minx maxx maxx minx minx], [maxy maxy miny miny maxy], 'k');
@@ -166,18 +169,18 @@ subplot(4,5, [2 3 7 8 12 13]);
 xPlot = xc(chansToPlot);
 yPlot = yc(chansToPlot);
 p.LineWidth = 0.01; p.alpha = 0.25;
-for i=1:params.nWFsToPlot
-    plotWaveform(double(squeeze(bckgWF(i,chansToPlot,:)))*params.gain, xPlot, yPlot, 18, 0.2/params.gain, [], 0.75*[1 1 1],p);
-    hold on;
-end
+% for i=1:params.nWFsToPlot
+%     plotWaveform(double(squeeze(bckgWF(i,chansToPlot,:)))*params.gain, xPlot, yPlot, 18, 0.1/params.gain, [], 0.75*[1 1 1],p);
+%     hold on;
+% end
 
 for i=1:params.nWFsToPlot
-    plotWaveform(double(squeeze(theseWF(i,chansToPlot,:)))*params.gain, xPlot, yPlot, 18, 0.2/params.gain, [], neuronColor,p);
+    plotWaveform(double(squeeze(theseWF(i,chansToPlot,:)))*params.gain, xPlot, yPlot, 18, 0.1/params.gain, [], neuronColor,p);
     hold on;
 end
 
 p.LineWidth = 1; p.alpha = 1;
-plotWaveform(medWFuV(:,chansToPlot)', xPlot, yPlot, 18, 0.2/params.gain, [], [0 0 0],p);
+plotWaveform(medWFuV(:,chansToPlot)', xPlot, yPlot, 18, 0.1/params.gain, [], [0 0 0],p);
 box off;
 title(sprintf('waveform samples; amp=%.0fµV, SNR=%.2f', wfAmp, snr));
 
@@ -290,9 +293,9 @@ title('firing rate over time')
 xlabel('time(sec)')
 ylabel('firing rate (sp/sec)')
 
-legend([h1 h2], {'top PC', 'firing rate'})
+%legend([h1 h2], {'top PC', 'firing rate'})
 
-box off;
+%box off;
 
 %% histogram of fit amplitudes 
 
